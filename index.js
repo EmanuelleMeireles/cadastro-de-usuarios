@@ -8,27 +8,89 @@ function salvarCadastro(cadastro) {
   localStorage.setItem('cadastros', JSON.stringify(cadastros));
 }
 
+function verificarEmailExistente(email) {
+  let cadastros = JSON.parse(localStorage.getItem('cadastros')) || [];
+  return cadastros.find((cadastro) => cadastro.email === email);
+}
+
+function buscarUsuario() {
+  let emailBusca = document.getElementById('email-busca').value.trim();
+  let cadastros = JSON.parse(localStorage.getItem('cadastros')) || [];
+  let resultadoDiv = document.getElementById('resultado-busca');
+  let listaDiv = document.getElementById('lista-cadastros');
+
+  let usuariosEncontrados = cadastros.filter(
+    (cadastro) => cadastro.email === emailBusca
+  );
+
+  if (usuariosEncontrados.length > 0) {
+    let lista = usuariosEncontrados
+      .map((usuario) => {
+        let dataNascimento = new Date(usuario.dataNascimento);
+        let dataFormatada = new Date(
+          dataNascimento.getTime() - dataNascimento.getTimezoneOffset() * 60000
+        );
+
+        return `
+        <li>
+          <strong>Nome:</strong> ${usuario.nome}<br>
+          <strong>Data de Nascimento:</strong> ${dataFormatada.toLocaleDateString(
+            'pt-BR'
+          )}<br>
+          <strong>Telefone:</strong> ${usuario.telefone}<br>
+          <strong>E-mail:</strong> ${usuario.email}
+        </li>
+      `;
+      })
+      .join('');
+
+    resultadoDiv.innerHTML = `<ul>${lista}</ul>`;
+  } else {
+    resultadoDiv.innerHTML = `<p style="color: red;">Nenhum usuário encontrado com este e-mail.</p>`;
+    exibirCadastros();
+  }
+}
+
 function exibirCadastros() {
   let cadastros = JSON.parse(localStorage.getItem('cadastros')) || [];
+  let listaDiv = document.getElementById('lista-cadastros');
+
+  document.getElementById('resultado-busca').innerHTML = '';
+
+  if (cadastros.length === 0) {
+    listaDiv.innerHTML = '<p>Nenhum cadastro encontrado.</p>';
+    return;
+  }
+
   let lista = cadastros
-    .map(
-      (cadastro, index) => `
+    .map((cadastro) => {
+      let dataNascimento = new Date(cadastro.dataNascimento);
+      let dataFormatada = dataNascimento.toLocaleDateString('pt-BR', {
+        timeZone: 'UTC',
+      });
+
+      return `
       <li>
-          ${cadastro.nome} - ${cadastro.email} 
-          <button onclick="deletarCadastro(${index})">Deletar</button>
+        <strong>Nome:</strong> ${cadastro.nome}<br>
+        <strong>Data de Nascimento:</strong> ${dataFormatada}<br>
+        <strong>Telefone:</strong> ${cadastro.telefone}<br>
+        <strong>E-mail:</strong> ${cadastro.email}
       </li>
-  `
-    )
+    `;
+    })
     .join('');
 
-  document.getElementById('lista-cadastros').innerHTML = `<ul>${lista}</ul>`;
+  listaDiv.innerHTML = `<ul>${lista}</ul>`;
 }
 
 function deletarCadastro(index) {
   let cadastros = JSON.parse(localStorage.getItem('cadastros')) || [];
   cadastros.splice(index, 1);
   localStorage.setItem('cadastros', JSON.stringify(cadastros));
-  exibirCadastros();
+}
+
+function voltar() {
+  window.location.href = 'index.html';
 }
 
 document
@@ -53,8 +115,7 @@ document
       return;
     }
 
-    let cadastros = JSON.parse(localStorage.getItem('cadastros')) || [];
-    let emailExistente = cadastros.find((cadastro) => cadastro.email === email);
+    let emailExistente = verificarEmailExistente(email);
 
     if (emailExistente) {
       alert('Este e-mail já está cadastrado. Tente outro.');
@@ -67,6 +128,7 @@ document
     event.target.reset();
 
     alert('Cadastro realizado com sucesso!');
+    exibirCadastros();
   });
 
 document.addEventListener('DOMContentLoaded', () => {
