@@ -5,7 +5,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Cadastro</title>
-  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="/css/style.css">
 </head>
 
 <body>
@@ -17,13 +17,13 @@
 
     <form class="formulario-registro">
       <label for="nome">Nome</label>
-      <input type="text" id="nome" name="nome" placeholder="Digite seu nome completo" required>
+      <input type="text" id="nome" name="nome" placeholder="Digite seu nome completo" required pattern="[A-Za-zÀ-ÿ\s]+" title="Digite apenas letras e espaços">
 
       <label for="data-nascimento">Data de Nascimento</label>
       <input type="date" id="data-nascimento" name="data-nascimento" required>
 
       <label for="telefone">Telefone</label>
-      <input type="tel" id="telefone" name="telefone" placeholder="(DDD) Telefone" required>
+      <input type="tel" id="telefone" name="telefone" placeholder="(DDD) Telefone" required pattern="\d{10,11}" title="Digite um telefone válido com 10 ou 11 dígitos">
 
       <label for="email">E-mail</label>
       <input type="email" id="email" name="email" placeholder="Digite seu e-mail" required>

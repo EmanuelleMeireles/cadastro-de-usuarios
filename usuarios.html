@@ -5,18 +5,60 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Usuários Cadastrados</title>
-  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="/css/style.css"">
 </head>
 
 <body>
-  <div class="container">
-    <header>
-      <h1>Usuários Cadastrados</h1>
-      <p>Veja abaixo os dados das pessoas já cadastradas.</p>
-    </header>
+  <div class=" container">
+  <header>
+    <h1>Usuários Cadastrados</h1>
+    <p>Veja abaixo os dados das pessoas já cadastradas.</p>
+  </header>
+  <div id="lista-cadastros">
   </div>
   <button onclick="voltar()">Voltar</button>
   </div>
-</body>
+
+  <script>
+    function exibirCadastros() {
+      let cadastros = JSON.parse(localStorage.getItem('cadastros')) || [];
+      if (cadastros.length === 0) {
+        document.getElementById('lista-cadastros').innerHTML = '<p>Nenhum cadastro encontrado.</p>';
+        return;
+      }
+
+      let lista = cadastros.map((cadastro, index) => {
+        let [ano, mes, dia] = cadastro.dataNascimento.split('-');
+        let dataFormatada = `${dia}/${mes}/${ano}`;
+
+        return `
+      <li>
+        <strong>Nome:</strong> ${cadastro.nome}<br>
+        <strong>Data de Nascimento:</strong> ${dataFormatada}<br>
+        <strong>Telefone:</strong> ${cadastro.telefone}<br>
+        <strong>E-mail:</strong> ${cadastro.email}<br>
+        <button onclick="deletarCadastro(${index})">Deletar</button>
+      </li>
+    `;
+      }).join('');
+
+      document.getElementById('lista-cadastros').innerHTML = `<ul>${lista}</ul>`;
+    }
+
+
+    function deletarCadastro(index) {
+      let cadastros = JSON.parse(localStorage.getItem('cadastros')) || [];
+      cadastros.splice(index, 1);
+      localStorage.setItem('cadastros', JSON.stringify(cadastros));
+      exibirCadastros();
+    }
+
+    function voltar() {
+      window.location.href = 'index.html';
+    }
+
+    document.addEventListener('DOMContentLoaded', exibirCadastros);
+  </script>
+  </body>
 
 </html>
