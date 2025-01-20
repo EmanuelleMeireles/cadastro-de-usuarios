@@ -25,11 +25,13 @@ function buscarUsuario() {
 
   if (usuariosEncontrados.length > 0) {
     let lista = usuariosEncontrados
-      .map((usuario) => {
+      .map((usuario, index) => {
         let dataNascimento = new Date(usuario.dataNascimento);
         let dataFormatada = new Date(
           dataNascimento.getTime() - dataNascimento.getTimezoneOffset() * 60000
         );
+
+        let btnExcluirStyle = 'background-color: #e53935;';
 
         return `
         <li>
@@ -39,6 +41,7 @@ function buscarUsuario() {
           )}<br>
           <strong>Telefone:</strong> ${usuario.telefone}<br>
           <strong>E-mail:</strong> ${usuario.email}
+          <button class="btn-excluir" style="${btnExcluirStyle}" onclick="confirmarExclusao(${index})">Excluir</button>
         </li>
       `;
       })
@@ -63,7 +66,7 @@ function exibirCadastros() {
   }
 
   let lista = cadastros
-    .map((cadastro) => {
+    .map((cadastro, index) => {
       let dataNascimento = new Date(cadastro.dataNascimento);
       let dataFormatada = dataNascimento.toLocaleDateString('pt-BR', {
         timeZone: 'UTC',
@@ -75,6 +78,7 @@ function exibirCadastros() {
         <strong>Data de Nascimento:</strong> ${dataFormatada}<br>
         <strong>Telefone:</strong> ${cadastro.telefone}<br>
         <strong>E-mail:</strong> ${cadastro.email}
+        <button class="btn-excluir" onclick="confirmarExclusao(${index})">Excluir</button>
       </li>
     `;
     })
@@ -83,10 +87,18 @@ function exibirCadastros() {
   listaDiv.innerHTML = `<ul>${lista}</ul>`;
 }
 
+function confirmarExclusao(index) {
+  let confirmar = confirm('Tem certeza que deseja excluir o funcionário?');
+  if (confirmar) {
+    deletarCadastro(index);
+  }
+}
+
 function deletarCadastro(index) {
   let cadastros = JSON.parse(localStorage.getItem('cadastros')) || [];
   cadastros.splice(index, 1);
   localStorage.setItem('cadastros', JSON.stringify(cadastros));
+  exibirCadastros();
 }
 
 function voltar() {

@@ -68,11 +68,11 @@ button:hover,
 }
 
 button.voltar {
-  background-color: #ff4081; /* Agora com a mesma cor de fundo */
+  background-color: #ff4081;
 }
 
 button.voltar:hover {
-  background-color: #e73370; /* Mudança de cor no hover */
+  background-color: #e73370;
 }
 
 .consultar {
@@ -138,10 +138,28 @@ button.voltar:hover {
   border-radius: 8px;
   border: 1px solid #ddd;
   text-align: left;
+  position: relative;
 }
 
 #lista-cadastros li strong {
   color: #333;
+}
+
+#lista-cadastros li .btn-excluir {
+  background-color: #e53935;
+  color: white;
+  padding: 5px 10px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  position: absolute;
+  right: 60px;
+  top: 50%;
+  transform: translateY(-50%);
+}
+
+#lista-cadastros li .btn-excluir:hover {
+  background-color: #d32f2f;
 }
 
 @media (max-width: 768px) {
