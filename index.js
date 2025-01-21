@@ -17,7 +17,6 @@ function buscarUsuario() {
   let emailBusca = document.getElementById('email-busca').value.trim();
   let cadastros = JSON.parse(localStorage.getItem('cadastros')) || [];
   let resultadoDiv = document.getElementById('resultado-busca');
-  let listaDiv = document.getElementById('lista-cadastros');
 
   let usuariosEncontrados = cadastros.filter(
     (cadastro) => cadastro.email === emailBusca
@@ -26,22 +25,15 @@ function buscarUsuario() {
   if (usuariosEncontrados.length > 0) {
     let lista = usuariosEncontrados
       .map((usuario, index) => {
-        let dataNascimento = new Date(usuario.dataNascimento);
-        let dataFormatada = new Date(
-          dataNascimento.getTime() - dataNascimento.getTimezoneOffset() * 60000
-        );
-
-        let btnExcluirStyle = 'background-color: #e53935;';
-
         return `
         <li>
           <strong>Nome:</strong> ${usuario.nome}<br>
-          <strong>Data de Nascimento:</strong> ${dataFormatada.toLocaleDateString(
-            'pt-BR'
+          <strong>Data de Nascimento:</strong> ${formatarData(
+            usuario.dataNascimento
           )}<br>
           <strong>Telefone:</strong> ${usuario.telefone}<br>
           <strong>E-mail:</strong> ${usuario.email}
-          <button class="btn-excluir" style="${btnExcluirStyle}" onclick="confirmarExclusao(${index})">Excluir</button>
+          <button class="btn-excluir" onclick="confirmarExclusao(${index})">Excluir</button>
         </li>
       `;
       })
@@ -67,15 +59,12 @@ function exibirCadastros() {
 
   let lista = cadastros
     .map((cadastro, index) => {
-      let dataNascimento = new Date(cadastro.dataNascimento);
-      let dataFormatada = dataNascimento.toLocaleDateString('pt-BR', {
-        timeZone: 'UTC',
-      });
-
       return `
       <li>
         <strong>Nome:</strong> ${cadastro.nome}<br>
-        <strong>Data de Nascimento:</strong> ${dataFormatada}<br>
+        <strong>Data de Nascimento:</strong> ${formatarData(
+          cadastro.dataNascimento
+        )}<br>
         <strong>Telefone:</strong> ${cadastro.telefone}<br>
         <strong>E-mail:</strong> ${cadastro.email}
         <button class="btn-excluir" onclick="confirmarExclusao(${index})">Excluir</button>
@@ -101,8 +90,36 @@ function deletarCadastro(index) {
   exibirCadastros();
 }
 
+function formatarData(dataString) {
+  let [ano, mes, dia] = dataString.split('-');
+  return `${dia}/${mes}/${ano}`;
+}
+
+function formatarTelefone(event) {
+  const input = event.target;
+  let valor = input.value.replace(/\D/g, '');
+
+  if (valor.length > 10) {
+    valor = valor.replace(/^(\d{2})(\d{5})(\d{4})/, '($1)$2-$3');
+  } else if (valor.length > 6) {
+    valor = valor.replace(/^(\d{2})(\d{4})(\d{0,4})/, '($1)$2-$3');
+  } else if (valor.length > 2) {
+    valor = valor.replace(/^(\d{2})(\d{0,4})/, '($1)$2');
+  } else {
+    valor = valor.replace(/^(\d{0,2})/, '($1');
+  }
+
+  input.value = valor;
+}
+
+document.getElementById('telefone').addEventListener('input', formatarTelefone);
+
 function voltar() {
-  window.location.href = 'index.html';
+  if (window.history.length > 1) {
+    window.history.back();
+  } else {
+    window.location.href = 'index.html';
+  }
 }
 
 document
@@ -111,7 +128,7 @@ document
     event.preventDefault();
 
     let nome = document.getElementById('nome').value.trim();
-    let dataNascimento = document.getElementById('data-nascimento').value;
+    let dataNascimento = document.getElementById('data-nascimento').value; // String no formato YYYY-MM-DD
     let telefone = document.getElementById('telefone').value.trim();
     let email = document.getElementById('email').value.trim();
 
@@ -120,10 +137,8 @@ document
       return;
     }
 
-    if (!/^\d{10,11}$/.test(telefone)) {
-      alert(
-        'O campo Telefone deve conter apenas números com 10 ou 11 dígitos.'
-      );
+    if (!/^\(\d{2}\)\d{4,5}-\d{4}$/.test(telefone)) {
+      alert('O campo Telefone deve estar no formato (DDD)xxxx-xxxx.');
       return;
     }
 
